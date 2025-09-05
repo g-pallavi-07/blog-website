@@ -65,6 +65,25 @@
         window.location.href = `post.html?id=${encodeURIComponent(post.id)}`;
       });
       container.appendChild(card);
+
+    const posts = getPosts();
+    posts.forEach(post => {
+    const postCard = document.createElement('div');
+    postCard.className = 'post-card';
+
+    postCard.addEventListener('click', () => {
+        window.location.href = `post.html?id=${encodeURIComponent(post.id)}`;
+    });
+
+    postCard.innerHTML = `
+        <h2 class="post-title">${post.title}</h2>
+        <div class="post-meta">Category: ${post.category} • Author: ${post.author}</div>
+        <div class="post-tags">Tags: ${post.tags.join(', ')}</div>
+    `;
+
+    postsContainer.appendChild(postCard);
+    });
+
     });
   }
 

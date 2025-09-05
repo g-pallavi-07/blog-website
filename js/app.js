@@ -1,15 +1,15 @@
-// Get all posts from localStorage
+// Get posts from localStorage
 function getPosts() {
   const posts = localStorage.getItem('posts');
   return posts ? JSON.parse(posts) : [];
 }
 
-// Save posts array to localStorage
+// Save posts to localStorage
 function savePosts(posts) {
   localStorage.setItem('posts', JSON.stringify(posts));
 }
 
-// Generate unique ID
+// Generate ID
 function generateId() {
   return 'post-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
 }
@@ -36,13 +36,13 @@ function createPost(title, category, tagsString, content) {
   return newPost;
 }
 
-// Get a post by ID
+// Get post by ID
 function getPostById(id) {
   const posts = getPosts();
   return posts.find(p => p.id === id);
 }
 
-// Update a post by ID
+// Update post 
 function updatePost(id, updatedData) {
   const posts = getPosts();
   const index = posts.findIndex(p => p.id === id);
@@ -54,14 +54,14 @@ function updatePost(id, updatedData) {
   return true;
 }
 
-// Delete a post by ID
+// Delete a post
 function deletePost(id) {
   let posts = getPosts();
   posts = posts.filter(p => p.id !== id);
   savePosts(posts);
 }
 
-// Add comment to a post
+// Add comment 
 function addComment(postId, text) {
   const posts = getPosts();
   const post = posts.find(p => p.id === postId);

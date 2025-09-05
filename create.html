@@ -61,6 +61,63 @@
     } else {
       message.textContent = 'Error creating post. Please try again.';
     }
+    // Detect edit mode
+const editPostId = sessionStorage.getItem('editPostId');
+const form = document.getElementById('postForm');
+const message = document.getElementById('message');
+
+if (editPostId) {
+  // Load existing post data to form
+  const postToEdit = getPostById(editPostId);
+  if (postToEdit) {
+    form.title.value = postToEdit.title;
+    form.category.value = postToEdit.category;
+    form.tags.value = postToEdit.tags.join(', ');
+    form.content.value = postToEdit.content;
+  }
+}
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  message.textContent = '';
+
+  const title = form.title.value.trim();
+  const category = form.category.value.trim();
+  const tags = form.tags.value.trim();
+  const content = form.content.value.trim();
+
+  if (!title || !category || !content) {
+    message.textContent = 'Please fill in all mandatory fields.';
+    return;
+  }
+
+  if (editPostId) {
+    // Update existing post
+    const success = updatePost(editPostId, {
+      title,
+      category,
+      tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+      content
+    });
+    if (success) {
+      sessionStorage.removeItem('editPostId');
+      alert('Post updated successfully!');
+      window.location.href = 'manage.html'; // Go back to manage page
+    } else {
+      message.textContent = 'Error updating post. Try again.';
+    }
+  } else {
+    // Create new post
+    const newPost = createPost(title, category, tags, content);
+    if (newPost) {
+      alert('Post created successfully!');
+      window.location.href = 'index.html'; // Go to home page
+    } else {
+      message.textContent = 'Error creating post. Try again.';
+    }
+  }
+});
+
   });
 </script>
 

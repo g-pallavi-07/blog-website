@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>View Post</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="create.html">Create Post</a>
+    <a href="manage.html">Manage Posts</a>
+    <a href="auth.html" class="auth-link">Sign In / Sign Up</a>
+    <button id="logoutBtn">Logout</button>
+    <span id="userEmail"></span>
+  </nav>
+</header>
+
+<main>
+  <h1 id="postTitle">Loading...</h1>
+  <div class="post-meta" id="postMeta"></div>
+  <div class="post-content" id="postContent"></div>
+
+  <section id="commentsSection">
+    <h2>Comments</h2>
+    <div id="commentsList"></div>
+
+    <form id="commentForm">
+      <textarea id="commentText" placeholder="Add your comment here..." required></textarea>
+      <button type="submit">Add Comment</button>
+    </form>
+    <p id="commentMessage"></p>
+  </section>
+</main>
+
+<script src="js/app.js"></script>
+<script>
+  // Redirect if not logged in
+  const loggedInUser = localStorage.getItem('loggedInUser');
+  if (!loggedInUser) window.location.href = 'auth.html';
+
+  // Show logged in user email
+  const userEmailSpan = document.getElementById('userEmail');
+  if (userEmailSpan) userEmailSpan.textContent = `Logged in as: ${loggedInUser}`;
+
+  // Logout button
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('loggedInUser');
+      window.location.href = 'auth.html';
+    });
+  }
+
+  // Get post ID from URL query parameter
+  const params = new URLSearchParams(window.location.search);
+  const postId = params.get('id');
+
+  const postTitle = document.getElementById('postTitle');
+  const postMeta = document.getElementById('postMeta');
+  const postContent = document.getElementById('postContent');
+  const commentsList = document.getElementById('commentsList');
+  const commentForm = document.getElementById('commentForm');
+  const commentText = document.getElementById('commentText');
+  const commentMessage = document.getElementById('commentMessage');
+
+  if (!postId) {
+    postTitle.textContent = 'Post not found.';
+  } else {
+    loadPost(postId);
+  }
+
+  function loadPost(id) {
+    const post = getPostById(id);
+    if (!post) {
+      postTitle.textContent = 'Post not found.';
+      return;
+    }
+    postTitle.textContent = post.title;
+    postMeta.textContent = `Category: ${post.category} • Tags: ${post.tags.join(', ')}`;
+    postContent.textContent = post.content;
+
+    renderComments(post.comments || []);
+  }
+
+  function renderComments(comments) {
+    commentsList.innerHTML = '';
+    if (comments.length === 0) {
+      commentsList.innerHTML = '<p>No comments yet. Be the first!</p>';
+      return;
+    }
+    comments.forEach(comment => {
+      const div = document.createElement('div');
+      div.className = 'comment';
+      div.innerHTML = `
+        <div class="comment-user">${comment.user}</div>
+        <div class="comment-date">${new Date(comment.date).toLocaleString()}</div>
+        <div class="comment-text">${comment.text}</div>
+      `;
+      commentsList.appendChild(div);
+    });
+  }
+
+  commentForm.addEventListener('submit', e => {
+    e.preventDefault();
+    commentMessage.textContent = '';
+
+    const text = commentText.value.trim();
+    if (!text) {
+      commentMessage.textContent = 'Comment cannot be empty.';
+      return;
+    }
+
+    const success = addComment(postId, text);
+    if (success) {
+      commentText.value = '';
+      loadPost(postId);
+    } else {
+      commentMessage.textContent = 'Failed to add comment.';
+    }
+  });
+</script>
+
+</body>
+</html>
+
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Posts</title>
+  <link rel="stylesheet" href="css/style.css" />
+
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="create.html">Create Post</a>
+    <a href="manage.html" class="auth-link">Manage Posts</a>
+    <a href="auth.html" style="color:#fff; margin-left:auto;">Sign In / Sign Up</a>
+    <button id="logoutBtn">Logout</button>
+    <span id="userEmail" style="color:#fff; margin-left:10px;"></span>
+  </nav>
+</header>
+
+<main>
+  <h1>Manage Your Posts</h1>
+  <ul id="postList" class="post-list"></ul>
+</main>
+
+<script src="js/app.js"></script>
+<script>
+  // Redirect if not logged in
+  const loggedInUser = localStorage.getItem('loggedInUser');
+  if (!loggedInUser) window.location.href = 'auth.html';
+
+  // Show logged-in user email
+  const userEmailSpan = document.getElementById('userEmail');
+  if (userEmailSpan) userEmailSpan.textContent = `Logged in as: ${loggedInUser}`;
+
+  // Logout button handler
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('loggedInUser');
+      window.location.href = 'auth.html';
+    });
+  }
+
+  function renderManagePosts() {
+    const postList = document.getElementById('postList');
+    postList.innerHTML = '';
+
+    const posts = getPosts().filter(p => p.author === loggedInUser);
+    if (posts.length === 0) {
+      postList.innerHTML = '<p>You have no posts yet.</p>';
+      return;
+    }
+
+    posts.forEach(post => {
+      const li = document.createElement('li');
+      li.className = 'post-item';
+
+      li.innerHTML = `
+        <div class="post-info">
+          <h3 class="post-title">${post.title}</h3>
+          <p class="post-meta">Category: ${post.category}</p>
+        </div>
+        <div class="actions">
+          <button class="edit-btn">Edit</button>
+          <button class="delete-btn delete">Delete</button>
+        </div>
+      `;
+
+      li.querySelector('.edit-btn').addEventListener('click', () => {
+        // Store postId in sessionStorage and go to create.html for editing
+        sessionStorage.setItem('editPostId', post.id);
+        window.location.href = 'create.html';
+      });
+
+      li.querySelector('.delete-btn').addEventListener('click', () => {
+        if (confirm('Delete this post?')) {
+          deletePost(post.id);
+          renderManagePosts();
+        }
+      });
+
+      postList.appendChild(li);
+    });
+  }
+
+  renderManagePosts();
+</script>
+
+</body>
+</html>

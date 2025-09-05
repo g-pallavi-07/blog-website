@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home - Blog Posts</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="create.html">Create Post</a>
+    <a href="manage.html">Manage Posts</a>
+    <a href="auth.html" class="auth-link">Sign In / Sign Up</a>
+    <button id="logoutBtn">Logout</button>
+    <span id="userEmail"></span>
+  </nav>
+</header>
+
+<main>
+  <h1>All Blog Posts</h1>
+  <div id="postsContainer"></div>
+</main>
+
+<script src="js/app.js"></script>
+<script>
+  // Redirect if no user logged in
+  const loggedInUser = localStorage.getItem('loggedInUser');
+  if (!loggedInUser) window.location.href = 'auth.html';
+
+  // Show logged-in user email
+  const userEmailSpan = document.getElementById('userEmail');
+  if (userEmailSpan) userEmailSpan.textContent = `Logged in as: ${loggedInUser}`;
+
+  // Logout button handler
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('loggedInUser');
+      window.location.href = 'auth.html';
+    });
+  }
+
+  // Render all posts on page load
+  function renderPosts() {
+    const container = document.getElementById('postsContainer');
+    container.innerHTML = '';
+    const posts = getPosts();
+    if (posts.length === 0) {
+      container.innerHTML = '<p class="no-posts">No posts yet. Create one!</p>';
+      return;
+    }
+
+    posts.forEach(post => {
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.innerHTML = `
+        <h2 class="post-title">${post.title}</h2>
+        <div class="post-meta">Category: ${post.category}</div>
+        <div class="post-tags">Tags: ${post.tags.join(', ')}</div>
+      `;
+      card.addEventListener('click', () => {
+        window.location.href = `post.html?id=${encodeURIComponent(post.id)}`;
+      });
+      container.appendChild(card);
+    });
+  }
+
+  renderPosts();
+</script>
+
+</body>
+</html>
+
+</html>

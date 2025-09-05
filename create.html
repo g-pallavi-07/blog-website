@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create New Post</title>
+  <link rel="stylesheet" href="css/style.css" />
+
+</head>
+<body>
+
+<header>
+  <h1>Create New Blog Post</h1>
+</header>
+
+<form id="postForm">
+  <label for="title">Title *</label>
+  <input type="text" id="title" required />
+
+  <label for="category">Category *</label>
+  <input type="text" id="category" required />
+
+  <label for="tags">Tags (comma separated)</label>
+  <input type="text" id="tags" placeholder="e.g. tech, coding, javascript" />
+
+  <label for="content">Content *</label>
+  <textarea id="content" rows="8" required></textarea>
+
+  <button type="submit">Create Post</button>
+</form>
+
+<p class="message" id="message"></p>
+
+<script src="js/app.js"></script>
+<script>
+  // Redirect if not logged in
+  const loggedInUser = localStorage.getItem('loggedInUser');
+  if (!loggedInUser) window.location.href = 'auth.html';
+
+  const form = document.getElementById('postForm');
+  const message = document.getElementById('message');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    message.textContent = '';
+
+    const title = form.title.value.trim();
+    const category = form.category.value.trim();
+    const tags = form.tags.value.trim();
+    const content = form.content.value.trim();
+
+    if (!title || !category || !content) {
+      message.textContent = 'Please fill in all mandatory fields.';
+      return;
+    }
+
+    const newPost = createPost(title, category, tags, content);
+    if (newPost) {
+      alert('Post created successfully!');
+      window.location.href = 'index.html';
+    } else {
+      message.textContent = 'Error creating post. Please try again.';
+    }
+  });
+</script>
+
+</body>
+</html>

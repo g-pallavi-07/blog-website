@@ -47,25 +47,24 @@
   function renderPosts() {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
-
     const posts = getPosts();
+    if (posts.length === 0) {
+      container.innerHTML = '<p class="no-posts">No posts yet. Create one!</p>';
+      return;
+    }
+
     posts.forEach(post => {
-    const postCard = document.createElement('div');
-    postCard.className = 'post-card';
-
-    postCard.addEventListener('click', () => {
-        window.location.href = `post.html?id=${encodeURIComponent(post.id)}`;
-    });
-
-    postCard.innerHTML = `
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.innerHTML = `
         <h2 class="post-title">${post.title}</h2>
-        <div class="post-meta">Category: ${post.category} • Author: ${post.author}</div>
+        <div class="post-meta">Category: ${post.category}</div>
         <div class="post-tags">Tags: ${post.tags.join(', ')}</div>
-    `;
-
-    postsContainer.appendChild(postCard);
-    });
-
+      `;
+      card.addEventListener('click', () => {
+        window.location.href = `post.html?id=${encodeURIComponent(post.id)}`;
+      });
+      container.appendChild(card);
     });
   }
 
